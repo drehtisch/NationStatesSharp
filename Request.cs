@@ -11,23 +11,24 @@ namespace NationStatesSharp
 {
     public class Request
     {
-        private const string BaseUrl = "https://nationstates.net";
+        private const string BaseUrl = "https://nationstates.net/cgi-bin/";
 
         private Request()
         {
             TraceId = GenerateTraceId();
             Status = RequestStatus.Pending;
+            _completionSource = new TaskCompletionSource();
         }
 
-        public Request(string url, ResponseFormat responseFormat) : base()
+        public Request(string url, ResponseFormat responseFormat) : this()
         {
             if (string.IsNullOrWhiteSpace(url))
             {
                 throw new ArgumentException($"\"{nameof(url)}\" cannot be null or whitespace.", nameof(url));
             }
-            if (Uri.TryCreate(new Uri(BaseUrl), url, out _))
+            if (Uri.TryCreate(new Uri(BaseUrl), "api.cgi?" + url, out Uri parsedUri))
             {
-                Url = url;
+                Uri = parsedUri;
             }
             else
             {
@@ -37,7 +38,7 @@ namespace NationStatesSharp
         }
 
         public ResponseFormat ResponseFormat { get; private set; }
-        public string Url { get; private set; }
+        public Uri Uri { get; private set; }
         private readonly TaskCompletionSource _completionSource;
         public string TraceId { get; private set; }
         public object Response { get; private set; }
@@ -47,7 +48,7 @@ namespace NationStatesSharp
         {
             Response = response;
             Status = RequestStatus.Success;
-            _completionSource.TrySetResult();
+            _completionSource?.TrySetResult();
         }
 
         public void Fail(Exception ex)
@@ -58,7 +59,12 @@ namespace NationStatesSharp
                 ex = new Exception("Error not specified.");
             }
 
-            _completionSource.TrySetException(ex);
+            _completionSource?.TrySetException(ex);
+        }
+
+        public Task WaitForResponseAsync()
+        {
+            return WaitForResponseAsync(CancellationToken.None);
         }
 
         public Task WaitForResponseAsync(CancellationToken cancellationToken)
@@ -68,7 +74,7 @@ namespace NationStatesSharp
                 Status = RequestStatus.Canceled;
                 _completionSource.TrySetCanceled(cancellationToken);
             });
-            return _completionSource.Task;
+            return _completionSource?.Task;
         }
 
         public XmlDocument GetResponseAsXml() => Response as XmlDocument;

@@ -19,7 +19,7 @@ namespace NationStatesSharp
         {
             if (item.Status == RequestStatus.Pending)
             {
-                if (!isWaiting)
+                if (!isWaiting && Count > 2)
                 {
                     Jammed?.Invoke(this, new EventArgs());
                 }

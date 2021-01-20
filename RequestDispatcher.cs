@@ -18,7 +18,7 @@ namespace NationStatesSharp
             _worker = new RequestWorker(userAgent, logger);
         }
 
-        public void Dispatch(Request request, int priority)
+        public void Dispatch(Request request, int priority = 1000)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
@@ -46,7 +46,8 @@ namespace NationStatesSharp
             if (!_isRunning)
             {
                 _isRunning = true;
-                Task.Run(async () => await _worker.RunAsync(_tokenSource.Token));
+                _worker.RestartRequired += RequestQueue_RestartRequired;
+                Task.Run(async () => await _worker.RunAsync(_tokenSource.Token).ConfigureAwait(false));
             }
             else
             {

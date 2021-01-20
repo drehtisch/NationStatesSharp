@@ -1,17 +1,19 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace NationStatesSharp
 {
     public class RequestWorker
     {
-        public const long API_REQUEST_INTERVAL = 6125000; //0,6 s + additional 0,0125 s as buffer -> 0,6125 s
+        public const long API_REQUEST_INTERVAL = 6000000; //0,6 s
         private readonly HttpDataService _dataService;
         private readonly ILogger _logger;
 
@@ -39,6 +41,7 @@ namespace NationStatesSharp
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
             _requestQueue.Enqueue(request, priority);
+            _logger.Verbose("Request [{traceId}] has been queued. Queue size: {size}", request.TraceId, _requestQueue.Count);
         }
 
         public async Task RunAsync(CancellationToken cancellationToken)
@@ -53,9 +56,87 @@ namespace NationStatesSharp
             }
             while (await _requestQueue.WaitForNextItemAsync(cancellationToken).ConfigureAwait(false))
             {
-                await _semaphore.WaitAsync().ConfigureAwait(false);
+                var ticks = DateTime.UtcNow.Ticks;
                 var request = _requestQueue.Dequeue();
-                await _dataService.ExecuteRequestAsync(request).ContinueWith(_continue);
+                _logger.Verbose("Request [{traceId}] has been dequeued. Queue size: {size}", request.TraceId, _requestQueue.Count);
+                _logger.Verbose("[{traceId}]: Acquiring Semaphore", request.TraceId);
+                await _semaphore.WaitAsync().ConfigureAwait(false);
+                _logger.Verbose("[{traceId}]: Aquiring Semaphore took {duration}", request.TraceId, TimeSpan.FromTicks(DateTime.UtcNow.Ticks).Subtract(TimeSpan.FromTicks(ticks)));
+                try
+                {
+                    var task = _dataService.ExecuteRequestAsync(request, cancellationToken);
+                    _ = task.ContinueWith(_continue, cancellationToken);
+                    var httpResponse = await task.ConfigureAwait(false);
+                    if (!httpResponse.IsSuccessStatusCode)
+                    {
+                        request.Fail(new HttpRequestFailedException($"{(int)httpResponse.StatusCode} - {httpResponse.ReasonPhrase}"));
+                    }
+                    if (request.ResponseFormat == ResponseFormat.Xml)
+                    {
+                        request.Complete(await httpResponse.ReadXmlAsync(_logger));
+                    }
+                    else if (request.ResponseFormat == ResponseFormat.Boolean)
+                    {
+                        request.Complete(await httpResponse.ReadBooleanAsync());
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"Unknown ResponseFormat: {request.ResponseFormat}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "A error occurred.");
+                    request.Fail(ex);
+                }
+            }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static async Task<XmlDocument> ReadXmlAsync(this HttpResponseMessage httpResponse, ILogger logger)
+        {
+            if (httpResponse is null)
+                throw new ArgumentNullException(nameof(httpResponse));
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                {
+                    try
+                    {
+                        XmlDocument xml = new XmlDocument();
+                        if (logger.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
+                        {
+                            logger.Verbose(await httpResponse.Content.ReadAsStringAsync());
+                        }
+                        xml.Load(stream);
+                        return xml;
+                    }
+                    catch (XmlException ex)
+                    {
+                        throw new ApplicationException($"A error while loading xml occured.", ex);
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<bool?> ReadBooleanAsync(this HttpResponseMessage httpResponse)
+        {
+            if (httpResponse is null)
+                throw new ArgumentNullException(nameof(httpResponse));
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return bool.TryParse(content, out bool result) ? (bool?)result : (bool?)null;
+            }
+            else
+            {
+                return null;
             }
         }
     }

@@ -1,11 +1,12 @@
 ﻿using Serilog;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NationStatesSharp
 {
-    internal class HttpDataService
+    public class HttpDataService
     {
         private HttpMessageHandler _httpMessageHandler = null;
         private ILogger _logger;
@@ -19,23 +20,23 @@ namespace NationStatesSharp
             _logger = logger;
         }
 
-        public async Task<HttpResponseMessage> ExecuteRequestAsync(Request request)
+        public async Task<HttpResponseMessage> ExecuteRequestAsync(Request request, CancellationToken cancellationToken)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
             using (HttpClient client = GetHttpClient())
             {
-                client.DefaultRequestHeaders.Add("UserAgent", _userAgent);
-                var requestMessage = new HttpRequestMessage(HttpMethod.Get, request.Url);
-                _logger.Debug("[{traceId}] Executing {httpMethod}-Request to {requestUrl}", request.TraceId, requestMessage.Method, request.Url);
-                HttpResponseMessage response = await client.SendAsync(requestMessage).ConfigureAwait(false);
+                client.DefaultRequestHeaders.Add("User-Agent", _userAgent);
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get, request.Uri);
+                _logger.Debug("[{traceId}] Executing {httpMethod}-Request to {requestUrl}", request.TraceId, requestMessage.Method, request.Uri);
+                HttpResponseMessage response = await client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.Error("Request finished with response: {StatusCode}: {ReasonPhrase}", (int)response.StatusCode, response.ReasonPhrase);
+                    _logger.Error("[{traceId}] Request finished with response: {StatusCode}: {ReasonPhrase}", request.TraceId, (int)response.StatusCode, response.ReasonPhrase);
                 }
                 else
                 {
-                    _logger.Debug("Request finished with response: {StatusCode}: {ReasonPhrase}", (int)response.StatusCode, response.ReasonPhrase);
+                    _logger.Debug("[{traceId}] Request finished with response: {StatusCode}: {ReasonPhrase}", request.TraceId, (int)response.StatusCode, response.ReasonPhrase);
                 }
                 return response;
             }
