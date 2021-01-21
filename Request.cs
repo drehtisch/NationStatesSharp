@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace NationStatesSharp
 {
@@ -77,7 +78,7 @@ namespace NationStatesSharp
             return _completionSource?.Task;
         }
 
-        public XmlDocument GetResponseAsXml() => Response as XmlDocument;
+        public XDocument GetResponseAsXml() => Response as XDocument;
 
         public bool? GetResponseAsBoolean() => Response as bool?;
 

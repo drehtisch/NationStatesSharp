@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace NationStatesSharp
 {
@@ -73,7 +74,7 @@ namespace NationStatesSharp
                     }
                     if (request.ResponseFormat == ResponseFormat.Xml)
                     {
-                        request.Complete(await httpResponse.ReadXmlAsync(_logger));
+                        request.Complete(await httpResponse.ReadXmlAsync(_logger, cancellationToken));
                     }
                     else if (request.ResponseFormat == ResponseFormat.Boolean)
                     {
@@ -95,7 +96,7 @@ namespace NationStatesSharp
 
     public static class Extensions
     {
-        public static async Task<XmlDocument> ReadXmlAsync(this HttpResponseMessage httpResponse, ILogger logger)
+        public static async Task<XDocument> ReadXmlAsync(this HttpResponseMessage httpResponse, ILogger logger, CancellationToken cancellationToken)
         {
             if (httpResponse is null)
                 throw new ArgumentNullException(nameof(httpResponse));
@@ -105,13 +106,11 @@ namespace NationStatesSharp
                 {
                     try
                     {
-                        XmlDocument xml = new XmlDocument();
                         if (logger.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
                         {
                             logger.Verbose(await httpResponse.Content.ReadAsStringAsync());
                         }
-                        xml.Load(stream);
-                        return xml;
+                        return await XDocument.LoadAsync(stream, LoadOptions.None, cancellationToken);
                     }
                     catch (XmlException ex)
                     {
