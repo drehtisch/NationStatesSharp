@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,6 +17,12 @@ namespace NationStatesSharp
         public RequestDispatcher(string userAgent, ILogger logger)
         {
             _worker = new RequestWorker(userAgent, logger);
+        }
+
+        public RequestDispatcher(string userAgent)
+        {
+            ConfigureLogging();
+            _worker = new RequestWorker(userAgent, Log.Logger);
         }
 
         public void Dispatch(Request request, int priority = 1000)
@@ -53,6 +60,13 @@ namespace NationStatesSharp
             {
                 throw new InvalidOperationException("The dispatcher is already running.");
             }
+        }
+
+        private void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.Console(theme: SystemConsoleTheme.Literate).CreateLogger();
         }
     }
 }
