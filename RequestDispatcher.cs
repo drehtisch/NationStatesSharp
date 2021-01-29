@@ -34,6 +34,18 @@ namespace NationStatesSharp
             _worker.Enqueue(request, priority);
         }
 
+        public void Dispatch(IEnumerable<Request> requests, int priority = 1000)
+        {
+            if (requests is null)
+                throw new ArgumentNullException(nameof(requests));
+            if (!_isRunning)
+                throw new InvalidOperationException("Requests cannot be dispatched when the dispatcher has not been started yet.");
+            foreach (Request request in requests)
+            {
+                _worker.Enqueue(request, priority);
+            }
+        }
+
         private void RequestQueue_RestartRequired(object sender, EventArgs e)
         {
             if (sender is RequestWorker worker)
