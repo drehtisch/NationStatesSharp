@@ -7,16 +7,15 @@
     <Company />
     <Product />
     <PackageLicenseExpression></PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/drehtisch/NationStatesSharp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/drehtisch/NationStatesSharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Free-Nations-Region/NationStatesSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Free-Nations-Region/NationStatesSharp</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) 2021 drehtisch</Copyright>
-    <PackageReleaseNotes>Initial Version</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <NeutralLanguage>Englisch</NeutralLanguage>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageVersion>0.0.1-preview-2</PackageVersion>
+    <PackageVersion>0.0.1-preview-3</PackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="WrapperTest\**" />
