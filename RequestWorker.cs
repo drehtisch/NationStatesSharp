@@ -39,7 +39,7 @@ namespace NationStatesSharp
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
             _requestQueue.Enqueue(request, priority);
-            _logger.Verbose("Request [{traceId}] has been queued. Queue size: {size}", request.TraceId, _requestQueue.Count);
+            _logger.Debug("Request [{traceId}] has been queued. Queue size: {size}", request.TraceId, _requestQueue.Count);
         }
 
         public async Task RunAsync(CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ namespace NationStatesSharp
             {
                 var ticks = DateTime.UtcNow.Ticks;
                 var request = _requestQueue.Dequeue();
-                _logger.Verbose("Request [{traceId}] has been dequeued. Queue size: {size}", request.TraceId, _requestQueue.Count);
+                _logger.Debug("Request [{traceId}] has been dequeued. Queue size: {size}", request.TraceId, _requestQueue.Count);
                 _logger.Verbose("[{traceId}]: Acquiring Semaphore", request.TraceId);
                 await _semaphore.WaitAsync().ConfigureAwait(false);
                 _logger.Verbose("[{traceId}]: Aquiring Semaphore took {duration}", request.TraceId, TimeSpan.FromTicks(DateTime.UtcNow.Ticks).Subtract(TimeSpan.FromTicks(ticks)));

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using NationStatesSharp.Interfaces;
+using Serilog;
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NationStatesSharp
 {
-    public class HttpDataService
+    public class HttpDataService : IHttpDataService
     {
         private HttpMessageHandler _httpMessageHandler = null;
         private ILogger _logger;

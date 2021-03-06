@@ -16,16 +16,19 @@ namespace NationStatesSharp
         internal static async Task<XDocument> ReadXmlAsync(this HttpResponseMessage httpResponse, ILogger logger, CancellationToken cancellationToken)
         {
             if (httpResponse is null)
+            {
                 throw new ArgumentNullException(nameof(httpResponse));
+            }
+
             if (httpResponse.IsSuccessStatusCode)
             {
-                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                using (Stream stream = await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
                 {
                     try
                     {
                         if (logger.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
                         {
-                            logger.Verbose(await httpResponse.Content.ReadAsStringAsync());
+                            logger.Verbose(await httpResponse.Content.ReadAsStringAsync(cancellationToken));
                         }
                         return await XDocument.LoadAsync(stream, LoadOptions.None, cancellationToken);
                     }
@@ -44,11 +47,14 @@ namespace NationStatesSharp
         internal static async Task<bool?> ReadBooleanAsync(this HttpResponseMessage httpResponse)
         {
             if (httpResponse is null)
+            {
                 throw new ArgumentNullException(nameof(httpResponse));
+            }
+
             if (httpResponse.IsSuccessStatusCode)
             {
                 var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return bool.TryParse(content, out bool result) ? (bool?)result : (bool?)null;
+                return bool.TryParse(content, out bool result) ? result : (bool?)null;
             }
             else
             {
@@ -56,26 +62,24 @@ namespace NationStatesSharp
             }
         }
 
-        public static Task WaitForAllResponsesAsync(this IEnumerable<Request> requests, CancellationToken cancellationToken) => Task.WhenAll(requests.Select(r => r.WaitForResponseAsync(cancellationToken)));
-
-        public static Task WaitForAllResponsesAsync(this IEnumerable<Request> requests) => requests.WaitForAllResponsesAsync(CancellationToken.None);
-
-        public static IEnumerable<XElement> GetElementsByNodeName(this XDocument document, string nodeName)
-        {
-            return document.Elements().Where(e => e.Name == nodeName);
-        }
-
-        public static string GetAttributeValueByAttributeName(this XElement element, string attributeName)
-        {
-            return element.Attributes().FirstOrDefault(e => e.Name == attributeName)?.Value;
-        }
-
         public static IEnumerable<string> GetAttributeValuesByAttributeName(this IEnumerable<XElement> elements, string attributeName)
         {
-            foreach(var element in elements)
+            foreach (var element in elements)
             {
                 yield return element.GetAttributeValueByAttributeName(attributeName);
             }
         }
+
+        public static Task WaitForAllResponsesAsync(this IEnumerable<Request> requests, CancellationToken cancellationToken) => Task.WhenAll(requests.Select(r => r.WaitForResponseAsync(cancellationToken)));
+
+        public static Task WaitForAllResponsesAsync(this IEnumerable<Request> requests) => requests.WaitForAllResponsesAsync(CancellationToken.None);
+
+        public static string GetAttributeValueByAttributeName(this XElement element, string attributeName) => element.Attributes().FirstOrDefault(e => e.Name == attributeName)?.Value;
+
+        public static IEnumerable<XElement> FilterDescendantsByNameAndValue(this XDocument document, string nodeName, string value) => document?.Descendants(nodeName).Where(e => e.Value == value);
+
+        public static string GetFirstValueByNodeName(this XDocument document, string nodeName) => document?.Descendants(nodeName).FirstOrDefault()?.Value;
+
+        public static IEnumerable<XElement> GetParentsOfFilteredDescendants(this XDocument document, string nodeName, string value) => document?.FilterDescendantsByNameAndValue(nodeName, value).Select(e => e.Parent);
     }
 }

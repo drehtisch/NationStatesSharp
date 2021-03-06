@@ -1,14 +1,14 @@
-﻿using Serilog;
+﻿using NationStatesSharp.Interfaces;
+using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NationStatesSharp
 {
-    public class RequestDispatcher
+    public class RequestDispatcher : IRequestDispatcher
     {
         private bool _isRunning = false;
         private readonly CancellationTokenSource _tokenSource = new();
@@ -77,7 +77,7 @@ namespace NationStatesSharp
         private void ConfigureLogging()
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
+                .MinimumLevel.Debug()
                 .WriteTo.Console(theme: SystemConsoleTheme.Literate).CreateLogger();
         }
     }
