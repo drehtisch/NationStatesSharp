@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using NationStatesSharp.Enums;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,21 @@ namespace NationStatesSharp
         private readonly RequestPriorityQueue _requestQueue = new();
         private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public RequestWorker(string userAgent, ILogger logger)
+        private RequestWorker()
+        {
+            _requestQueue.Jammed += RequestQueue_Jammed;
+        }
+
+        public RequestWorker(IEnumerable<string> userAgentParts, ILogger logger) : this()
+        {
+            if (!userAgentParts.Any()) throw new InvalidOperationException("No Request can be send when no UserAgent has been provided.");
+            _dataService = new HttpDataService(userAgentParts, logger);
+            _logger = logger;
+        }
+
+        public RequestWorker(string userAgent, ILogger logger) : this(new List<string>() { userAgent }, logger)
         {
             if (string.IsNullOrWhiteSpace(userAgent)) throw new InvalidOperationException("No Request can be send when contact info hasn't been provided.");
-            _dataService = new HttpDataService(userAgent, logger);
-            _logger = logger;
-            _requestQueue.Jammed += RequestQueue_Jammed;
         }
 
         private void RequestQueue_Jammed(object sender, EventArgs e)

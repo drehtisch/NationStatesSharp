@@ -1,6 +1,8 @@
 ﻿using NationStatesSharp.Interfaces;
 using Serilog;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,14 +13,18 @@ namespace NationStatesSharp
     {
         private HttpMessageHandler _httpMessageHandler = null;
         private ILogger _logger;
-        private string _userAgent;
+        private IEnumerable<string> _userAgentParts;
 
-        public HttpDataService(string userAgent, ILogger logger)
+        public HttpDataService(IEnumerable<string> userAgentParts, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(userAgent)) throw new InvalidOperationException("No Request can be send when contact info hasn't been provided.");
+            if (!userAgentParts.Any()) throw new InvalidOperationException("No Request can be send when no UserAgent has been provided.");
             if (logger is null) throw new ArgumentNullException(nameof(logger));
-            _userAgent = userAgent;
+            _userAgentParts = userAgentParts;
             _logger = logger;
+        }
+
+        public HttpDataService(string userAgent, ILogger logger) : this(new List<string>() { userAgent }, logger)
+        {
         }
 
         public async Task<HttpResponseMessage> ExecuteRequestAsync(Request request, CancellationToken cancellationToken)
@@ -27,7 +33,10 @@ namespace NationStatesSharp
 
             using (HttpClient client = GetHttpClient())
             {
-                client.DefaultRequestHeaders.Add("User-Agent", _userAgent);
+                foreach (var part in _userAgentParts)
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", part);
+                }
                 var requestMessage = new HttpRequestMessage(HttpMethod.Get, request.Uri);
                 _logger.Debug("[{traceId}] Executing {httpMethod}-Request to {requestUrl}", request.TraceId, requestMessage.Method, request.Uri);
                 HttpResponseMessage response = await client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);

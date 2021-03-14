@@ -1,4 +1,4 @@
-﻿namespace NationStatesSharp
+﻿namespace NationStatesSharp.Enums
 {
     public enum RequestStatus
     {
@@ -6,11 +6,5 @@
         Success,
         Canceled,
         Failed
-    }
-
-    public enum ResponseFormat
-    {
-        Xml,
-        Boolean
     }
 }
