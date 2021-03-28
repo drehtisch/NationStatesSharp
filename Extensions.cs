@@ -44,6 +44,16 @@ namespace NationStatesSharp
             }
         }
 
+        internal static async Task<Stream> ReadStreamAsync(this HttpResponseMessage httpResponse)
+        {
+            if (httpResponse is null)
+            {
+                throw new ArgumentNullException(nameof(httpResponse));
+            }
+
+            return httpResponse.IsSuccessStatusCode ? await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+        }
+
         internal static async Task<bool?> ReadBooleanAsync(this HttpResponseMessage httpResponse)
         {
             if (httpResponse is null)

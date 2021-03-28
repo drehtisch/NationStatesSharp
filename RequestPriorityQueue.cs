@@ -1,4 +1,5 @@
-﻿using Priority_Queue;
+﻿using NationStatesSharp.Enums;
+using Priority_Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;

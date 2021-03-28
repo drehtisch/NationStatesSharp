@@ -3,6 +3,7 @@
     public enum ResponseFormat
     {
         Xml,
-        Boolean
+        Boolean,
+        Stream
     }
 }

@@ -81,11 +81,15 @@ namespace NationStatesSharp
                     }
                     if (request.ResponseFormat == ResponseFormat.Xml)
                     {
-                        request.Complete(await httpResponse.ReadXmlAsync(_logger, cancellationToken));
+                        request.Complete(await httpResponse.ReadXmlAsync(_logger, cancellationToken).ConfigureAwait(false));
                     }
                     else if (request.ResponseFormat == ResponseFormat.Boolean)
                     {
-                        request.Complete(await httpResponse.ReadBooleanAsync());
+                        request.Complete(await httpResponse.ReadBooleanAsync().ConfigureAwait(false));
+                    }
+                    else if (request.ResponseFormat == ResponseFormat.Stream)
+                    {
+                        request.Complete(await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false));
                     }
                     else
                     {
