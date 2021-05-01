@@ -2,24 +2,27 @@
 using NationStatesSharp.Interfaces;
 using Serilog;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace NationStatesSharp
 {
-    public class DumpRetrievalService : IDumpRetrievalService
+    public class DefaultDumpRetrievalService : IDumpRetrievalService
     {
         private IRequestDispatcher _dispatcher;
         private ILogger _logger;
 
-        public DumpRetrievalService(IRequestDispatcher requestDispatcher, ILogger logger)
+        public DefaultDumpRetrievalService(IRequestDispatcher requestDispatcher, ILogger logger)
         {
             _dispatcher = requestDispatcher;
             _logger = logger;
         }
 
-        public DumpRetrievalService(IRequestDispatcher requestDispatcher) : this(requestDispatcher, Log.Logger)
+        public DefaultDumpRetrievalService(IRequestDispatcher requestDispatcher) : this(requestDispatcher, Log.Logger)
         {
         }
 

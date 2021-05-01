@@ -1,207 +1,127 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace NationStatesSharp.Models
 {
-	[XmlRoot(ElementName = "FREEDOM")]
-	public class Freedom
-	{
+    [XmlRoot(ElementName = "NATION")]
+    public class RawNationDumpModel
+    {
+        [XmlElement(ElementName = "NAME")]
+        public string Name;
 
-		[XmlElement(ElementName = "CIVILRIGHTS")]
-		public string CivilRights;
+        [XmlElement(ElementName = "TYPE")]
+        public string Type;
 
-		[XmlElement(ElementName = "ECONOMY")]
-		public string Economy;
+        [XmlElement(ElementName = "FULLNAME")]
+        public string FullName;
 
-		[XmlElement(ElementName = "POLITICALFREEDOM")]
-		public string PoliticalFreedom;
-	}
+        [XmlElement(ElementName = "MOTTO")]
+        public string Motto;
 
-	[XmlRoot(ElementName = "GOVT")]
-	public class Govt
-	{
+        [XmlElement(ElementName = "CATEGORY")]
+        public string Category;
 
-		[XmlElement(ElementName = "ADMINISTRATION")]
-		public double Administration;
+        [XmlElement(ElementName = "UNSTATUS")]
+        public string WAStatus;
 
-		[XmlElement(ElementName = "DEFENCE")]
-		public double Defence;
+        [XmlElement(ElementName = "ENDORSEMENTS")]
+        public string Endorsements;
 
-		[XmlElement(ElementName = "EDUCATION")]
-		public double Education;
+        [XmlElement(ElementName = "ISSUES_ANSWERED")]
+        public int IssuesAnswered;
 
-		[XmlElement(ElementName = "ENVIRONMENT")]
-		public double Environment;
+        [XmlElement(ElementName = "FREEDOM")]
+        public Freedom Freedom;
 
-		[XmlElement(ElementName = "HEALTHCARE")]
-		public double Healthcare;
+        [XmlElement(ElementName = "REGION")]
+        public string RegionName;
 
-		[XmlElement(ElementName = "COMMERCE")]
-		public double Commerce;
+        [XmlElement(ElementName = "POPULATION")]
+        public int Population;
 
-		[XmlElement(ElementName = "INTERNATIONALAID")]
-		public double InternationalAid;
+        [XmlElement(ElementName = "TAX")]
+        public double Tax;
 
-		[XmlElement(ElementName = "LAWANDORDER")]
-		public double LawAndOrder;
+        [XmlElement(ElementName = "ANIMAL")]
+        public string Animal;
 
-		[XmlElement(ElementName = "PUBLICTRANSPORT")]
-		public double PublicTransport;
+        [XmlElement(ElementName = "CURRENCY")]
+        public string Currency;
 
-		[XmlElement(ElementName = "SOCIALEQUALITY")]
-		public double SocialEquality;
+        [XmlElement(ElementName = "DEMONYM")]
+        public string Demonym;
 
-		[XmlElement(ElementName = "SPIRITUALITY")]
-		public double Spirituality;
+        [XmlElement(ElementName = "DEMONYM2")]
+        public string Demonym2;
 
-		[XmlElement(ElementName = "WELFARE")]
-		public double Welfare;
-	}
+        [XmlElement(ElementName = "DEMONYM2PLURAL")]
+        public string Demonym2Plural;
 
-	[XmlRoot(ElementName = "FREEDOMSCORES")]
-	public class FreedomScores
-	{
+        [XmlElement(ElementName = "FLAG")]
+        public string FlagUrl;
 
-		[XmlElement(ElementName = "CIVILRIGHTS")]
-		public double CivilRights;
+        [XmlElement(ElementName = "MAJORINDUSTRY")]
+        public string MajorIndustry;
 
-		[XmlElement(ElementName = "ECONOMY")]
-		public double Economy;
+        [XmlElement(ElementName = "GOVTPRIORITY")]
+        public string GovtPriority;
 
-		[XmlElement(ElementName = "POLITICALFREEDOM")]
-		public double PoliticalFreedom;
-	}
+        [XmlElement(ElementName = "GOVT")]
+        public Govt Govt;
 
-	[XmlRoot(ElementName = "CAUSE")]
-	public class Cause
-	{
+        [XmlElement(ElementName = "FOUNDED")]
+        public string Founded;
 
-		[XmlAttribute(AttributeName = "type")]
-		public string Type;
+        [XmlElement(ElementName = "FIRSTLOGIN")]
+        public int FirstLogin;
 
-		[XmlText]
-		public double Text;
-	}
+        [XmlElement(ElementName = "LASTLOGIN")]
+        public int LastLogin;
 
-	[XmlRoot(ElementName = "DEATHS")]
-	public class Deaths
-	{
+        [XmlElement(ElementName = "LASTACTIVITY")]
+        public string LastActivity;
 
-		[XmlElement(ElementName = "CAUSE")]
-		public List<Cause> CAUSE;
-	}
+        [XmlElement(ElementName = "INFLUENCE")]
+        public string Influence;
 
-	[XmlRoot(ElementName = "NATION")]
-	public class RawNationDumpModel
-	{
+        [XmlElement(ElementName = "FREEDOMSCORES")]
+        public FreedomScores FreedomScores;
 
-		[XmlElement(ElementName = "NAME")]
-		public string Name;
+        [XmlElement(ElementName = "PUBLICSECTOR")]
+        public double PublicSector;
 
-		[XmlElement(ElementName = "TYPE")]
-		public string Type;
+        [XmlElement(ElementName = "DEATHS")]
+        public Deaths Deaths;
 
-		[XmlElement(ElementName = "FULLNAME")]
-		public string FullName;
+        [XmlElement(ElementName = "LEADER")]
+        public string Leader;
 
-		[XmlElement(ElementName = "MOTTO")]
-		public string Motto;
+        [XmlElement(ElementName = "CAPITAL")]
+        public string Capital;
 
-		[XmlElement(ElementName = "CATEGORY")]
-		public string Category;
+        [XmlElement(ElementName = "RELIGION")]
+        public string Religion;
 
-		[XmlElement(ElementName = "UNSTATUS")]
-		public string WAStatus;
+        [XmlElement(ElementName = "FACTBOOKS")]
+        public int FactbookCount;
 
-		[XmlElement(ElementName = "ENDORSEMENTS")]
-		public string Endorsements;
+        [XmlElement(ElementName = "DISPATCHES")]
+        public int DispatchCount;
 
-		[XmlElement(ElementName = "ISSUES_ANSWERED")]
-		public int IssuesAnswered;
+        [XmlElement(ElementName = "DBID")]
+        public int DBId;
+    }
 
-		[XmlElement(ElementName = "FREEDOM")]
-		public Freedom Freedom;
+    [XmlRoot(ElementName = "NATIONS")]
+    public class NATIONS
+    {
+        [XmlElement(ElementName = "NATION")]
+        public List<RawNationDumpModel> Nations { get; set; }
 
-		[XmlElement(ElementName = "REGION")]
-		public string RegionName;
+        [XmlAttribute(AttributeName = "api_version")]
+        public int ApiVersion { get; set; }
 
-		[XmlElement(ElementName = "POPULATION")]
-		public int Population;
-
-		[XmlElement(ElementName = "TAX")]
-		public double Tax;
-
-		[XmlElement(ElementName = "ANIMAL")]
-		public string Animal;
-
-		[XmlElement(ElementName = "CURRENCY")]
-		public string Currency;
-
-		[XmlElement(ElementName = "DEMONYM")]
-		public string Demonym;
-
-		[XmlElement(ElementName = "DEMONYM2")]
-		public string Demonym2;
-
-		[XmlElement(ElementName = "DEMONYM2PLURAL")]
-		public string Demonym2Plural;
-
-		[XmlElement(ElementName = "FLAG")]
-		public string FlagUrl;
-
-		[XmlElement(ElementName = "MAJORINDUSTRY")]
-		public string MajorIndustry;
-
-		[XmlElement(ElementName = "GOVTPRIORITY")]
-		public string GovtPriority;
-
-		[XmlElement(ElementName = "GOVT")]
-		public Govt Govt;
-
-		[XmlElement(ElementName = "FOUNDED")]
-		public string Founded;
-
-		[XmlElement(ElementName = "FIRSTLOGIN")]
-		public int FirstLogin;
-
-		[XmlElement(ElementName = "LASTLOGIN")]
-		public int LastLogin;
-
-		[XmlElement(ElementName = "LASTACTIVITY")]
-		public string LastActivity;
-
-		[XmlElement(ElementName = "INFLUENCE")]
-		public string Influence;
-
-		[XmlElement(ElementName = "FREEDOMSCORES")]
-		public FreedomScores FreedomScores;
-
-		[XmlElement(ElementName = "PUBLICSECTOR")]
-		public double PublicSector;
-
-		[XmlElement(ElementName = "DEATHS")]
-		public Deaths Deaths;
-
-		[XmlElement(ElementName = "LEADER")]
-		public string Leader;
-
-		[XmlElement(ElementName = "CAPITAL")]
-		public string Capital;
-
-		[XmlElement(ElementName = "RELIGION")]
-		public string Religion;
-
-		[XmlElement(ElementName = "FACTBOOKS")]
-		public int FactbookCount;
-
-		[XmlElement(ElementName = "DISPATCHES")]
-		public int DispatchCount;
-
-		[XmlElement(ElementName = "DBID")]
-		public int DBId;
-	}
+        [XmlText]
+        public string Text { get; set; }
+    }
 }
