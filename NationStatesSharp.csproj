@@ -16,6 +16,7 @@
     <NeutralLanguage>Englisch</NeutralLanguage>
     <PackageReleaseNotes>- Introduce Interfaces
 - Improve Extension Methods for XML processing</PackageReleaseNotes>
+    <DocumentationFile>NationStatesSharp.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="WrapperTest\**" />

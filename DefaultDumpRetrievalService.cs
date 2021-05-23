@@ -11,10 +11,13 @@ using System.Xml;
 
 namespace NationStatesSharp
 {
+    ///<inheritdoc/>
     public class DefaultDumpRetrievalService : IDumpRetrievalService
     {
-        private IRequestDispatcher _dispatcher;
-        private ILogger _logger;
+        private readonly IRequestDispatcher _dispatcher;
+        private readonly ILogger _logger;
+
+#pragma warning disable CS1591
 
         public DefaultDumpRetrievalService(IRequestDispatcher requestDispatcher, ILogger logger)
         {
@@ -26,27 +29,14 @@ namespace NationStatesSharp
         {
         }
 
-        public async Task<Stream> DownloadDumpAsync(DumpType type, CancellationToken cancellationToken)
-        {
-            switch (type)
-            {
-                case DumpType.Nations:
-                    return await DownloadDumpAsync("pages/nations.xml.gz", cancellationToken);
+#pragma warning restore CS1591
 
-                case DumpType.Regions:
-                    return await DownloadDumpAsync("pages/regions.xml.gz", cancellationToken);
+        ///<inheritdoc/>
+        ///<exception cref="HttpRequestFailedException">Thrown when the HTTP Request failed.</exception>
+        public async Task<Stream> DownloadDumpAsync(DumpType type, CancellationToken cancellationToken) => await DownloadDumpAsync($"pages/{GetDumpFileNameByDumpType(type)}", cancellationToken).ConfigureAwait(false);
 
-                case DumpType.Cards1:
-                    return await DownloadDumpAsync("pages/cardlist_S1.xml.gz", cancellationToken);
-
-                case DumpType.Cards2:
-                    return await DownloadDumpAsync("pages/cardlist_S2.xml.gz", cancellationToken);
-
-                default:
-                    throw new InvalidOperationException($"Unsupported DumpType {type}");
-            }
-        }
-
+        ///<inheritdoc/>
+        ///<exception cref="HttpRequestFailedException">Thrown when the HTTP Request failed.</exception>
         public async Task<Stream> DownloadDumpAsync(string url, CancellationToken cancellationToken)
         {
             var request = new Request(url, ResponseFormat.Stream);
@@ -55,35 +45,41 @@ namespace NationStatesSharp
             return request.GetResponseAsStream();
         }
 
-        public bool IsLocalDumpAvailableAndUpToDate(DumpType type)
+        ///<inheritdoc/>
+        /// <exception cref="InvalidOperationException">Thrown when the DumpType is not supported.</exception>
+        public string GetDumpFileNameByDumpType(DumpType type)
         {
             switch (type)
             {
                 case DumpType.Nations:
-                    return IsLocalDumpAvailableAndUpToDate("nations.xml.gz");
+                    return "nations.xml.gz";
 
                 case DumpType.Regions:
-                    return IsLocalDumpAvailableAndUpToDate("regions.xml.gz");
+                    return "regions.xml.gz";
 
                 case DumpType.Cards1:
-                    return IsLocalDumpAvailableAndUpToDate("cardlist_S1.xml.gz");
+                    return "cardlist_S1.xml.gz";
 
                 case DumpType.Cards2:
-                    return IsLocalDumpAvailableAndUpToDate("cardlist_S2.xml.gz");
+                    return "cardlist_S2.xml.gz";
 
                 default:
                     throw new InvalidOperationException($"Unsupported DumpType {type}");
             }
         }
 
+        ///<inheritdoc/>
+        public bool IsLocalDumpAvailableAndUpToDate(DumpType type) => IsLocalDumpAvailableAndUpToDate(GetDumpFileNameByDumpType(type));
+
+        ///<inheritdoc/>
         public bool IsLocalDumpAvailableAndUpToDate(string path)
         {
             if (File.Exists(path))
             {
                 var fileInfo = new FileInfo(path);
                 var outdated = fileInfo.LastWriteTimeUtc.Date != DateTime.UtcNow.Date;
-                // Update time is 22:30 PM PST -> 6:30 AM UTC + 30 minutes buffer
-                if (DateTime.UtcNow.TimeOfDay < new TimeSpan(7, 0, 0) && outdated)
+                // Update time is 22:30 PM PST -> 6:30 AM UTC
+                if (DateTime.UtcNow.TimeOfDay < new TimeSpan(6, 30, 0) && outdated)
                 {
                     outdated = false;
                 }
