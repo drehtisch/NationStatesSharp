@@ -19,7 +19,7 @@ namespace NationStatesSharp
         public DefaultDumpRetrievalService(IRequestDispatcher requestDispatcher, ILogger logger)
         {
             _dispatcher = requestDispatcher;
-            _logger = logger;
+            _logger = logger.ForContext<DefaultDumpRetrievalService>();
         }
 
         public DefaultDumpRetrievalService(IRequestDispatcher requestDispatcher) : this(requestDispatcher, Log.Logger)

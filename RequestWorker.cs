@@ -28,7 +28,7 @@ namespace NationStatesSharp
         {
             if (!userAgentParts.Any()) throw new InvalidOperationException("No Request can be send when no UserAgent has been provided.");
             _dataService = new HttpDataService(userAgentParts, logger);
-            _logger = logger;
+            _logger = logger.ForContext<RequestWorker>();
         }
 
         public RequestWorker(string userAgent, ILogger logger) : this(new List<string>() { userAgent }, logger)
