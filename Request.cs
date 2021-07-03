@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NationStatesSharp.Enums;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -12,7 +14,7 @@ namespace NationStatesSharp
 {
     public class Request
     {
-        private const string BaseUrl = "https://nationstates.net/cgi-bin/";
+        private const string BaseUrl = "https://nationstates.net/";
 
         private Request()
         {
@@ -27,7 +29,12 @@ namespace NationStatesSharp
             {
                 throw new ArgumentException($"\"{nameof(url)}\" cannot be null or whitespace.", nameof(url));
             }
-            if (Uri.TryCreate(new Uri(BaseUrl), "api.cgi?" + url, out Uri parsedUri))
+            Uri parsedUri;
+            if (url.Contains("pages") && Uri.TryCreate(new Uri(BaseUrl), url, out parsedUri))
+            {
+                Uri = parsedUri;
+            }
+            else if (Uri.TryCreate(new Uri(BaseUrl), "cgi-bin/api.cgi?" + url, out parsedUri))
             {
                 Uri = parsedUri;
             }
@@ -81,6 +88,8 @@ namespace NationStatesSharp
         public XDocument GetResponseAsXml() => Response as XDocument;
 
         public bool? GetResponseAsBoolean() => Response as bool?;
+
+        public Stream GetResponseAsStream() => Response as Stream;
 
         private string GenerateTraceId()
         {

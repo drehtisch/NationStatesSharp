@@ -26,14 +26,16 @@ namespace NationStatesSharp
 
         public RequestWorker(IEnumerable<string> userAgentParts, ILogger logger) : this()
         {
-            if (!userAgentParts.Any()) throw new InvalidOperationException("No Request can be send when no UserAgent has been provided.");
+            if (!userAgentParts.Any())
+                throw new InvalidOperationException("No Request can be send when no UserAgent has been provided.");
             _dataService = new HttpDataService(userAgentParts, logger);
-            _logger = logger;
+            _logger = logger.ForContext<RequestWorker>();
         }
 
         public RequestWorker(string userAgent, ILogger logger) : this(new List<string>() { userAgent }, logger)
         {
-            if (string.IsNullOrWhiteSpace(userAgent)) throw new InvalidOperationException("No Request can be send when contact info hasn't been provided.");
+            if (string.IsNullOrWhiteSpace(userAgent))
+                throw new InvalidOperationException("No Request can be send when contact info hasn't been provided.");
         }
 
         private void RequestQueue_Jammed(object sender, EventArgs e)
@@ -49,7 +51,10 @@ namespace NationStatesSharp
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
             _requestQueue.Enqueue(request, priority);
-            _logger.Debug("Request [{traceId}] has been queued. Queue size: {size}", request.TraceId, _requestQueue.Count);
+            if (_requestQueue.Count > 0)
+            {
+                _logger.Debug("Request [{traceId}] has been queued. Queue size: {size}", request.TraceId, _requestQueue.Count);
+            }
         }
 
         public async Task RunAsync(CancellationToken cancellationToken)
@@ -77,15 +82,19 @@ namespace NationStatesSharp
                     var httpResponse = await task.ConfigureAwait(false);
                     if (!httpResponse.IsSuccessStatusCode)
                     {
-                        request.Fail(new HttpRequestFailedException($"{(int)httpResponse.StatusCode} - {httpResponse.ReasonPhrase}"));
+                        request.Fail(new HttpRequestFailedException($"{(int) httpResponse.StatusCode} - {httpResponse.ReasonPhrase}"));
                     }
                     if (request.ResponseFormat == ResponseFormat.Xml)
                     {
-                        request.Complete(await httpResponse.ReadXmlAsync(_logger, cancellationToken));
+                        request.Complete(await httpResponse.ReadXmlAsync(_logger, cancellationToken).ConfigureAwait(false));
                     }
                     else if (request.ResponseFormat == ResponseFormat.Boolean)
                     {
-                        request.Complete(await httpResponse.ReadBooleanAsync());
+                        request.Complete(await httpResponse.ReadBooleanAsync().ConfigureAwait(false));
+                    }
+                    else if (request.ResponseFormat == ResponseFormat.Stream)
+                    {
+                        request.Complete(await httpResponse.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false));
                     }
                     else
                     {

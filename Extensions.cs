@@ -28,9 +28,9 @@ namespace NationStatesSharp
                     {
                         if (logger.IsEnabled(Serilog.Events.LogEventLevel.Verbose))
                         {
-                            logger.Verbose(await httpResponse.Content.ReadAsStringAsync(cancellationToken));
+                            logger.Verbose(await httpResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false));
                         }
-                        return await XDocument.LoadAsync(stream, LoadOptions.None, cancellationToken);
+                        return await XDocument.LoadAsync(stream, LoadOptions.None, cancellationToken).ConfigureAwait(false);
                     }
                     catch (XmlException ex)
                     {
@@ -44,6 +44,16 @@ namespace NationStatesSharp
             }
         }
 
+        internal static async Task<Stream> ReadStreamAsync(this HttpResponseMessage httpResponse)
+        {
+            if (httpResponse is null)
+            {
+                throw new ArgumentNullException(nameof(httpResponse));
+            }
+
+            return httpResponse.IsSuccessStatusCode ? await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+        }
+
         internal static async Task<bool?> ReadBooleanAsync(this HttpResponseMessage httpResponse)
         {
             if (httpResponse is null)
@@ -54,7 +64,7 @@ namespace NationStatesSharp
             if (httpResponse.IsSuccessStatusCode)
             {
                 var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return bool.TryParse(content, out bool result) ? result : (bool?)null;
+                return bool.TryParse(content, out bool result) ? result : (bool?) null;
             }
             else
             {

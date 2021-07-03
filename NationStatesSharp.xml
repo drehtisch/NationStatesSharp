@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NationStatesSharp</name>
+    </assembly>
+    <members>
+        <member name="T:NationStatesSharp.DefaultDumpRetrievalService">
+            <inheritdoc/>
+        </member>
+        <member name="M:NationStatesSharp.DefaultDumpRetrievalService.DownloadDumpAsync(NationStatesSharp.Enums.DumpType,System.Threading.CancellationToken)">
+            <inheritdoc/>
+            <exception cref="T:NationStatesSharp.HttpRequestFailedException">Thrown when the HTTP Request failed.</exception>
+        </member>
+        <member name="M:NationStatesSharp.DefaultDumpRetrievalService.DownloadDumpAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc/>
+            <exception cref="T:NationStatesSharp.HttpRequestFailedException">Thrown when the HTTP Request failed.</exception>
+        </member>
+        <member name="M:NationStatesSharp.DefaultDumpRetrievalService.GetDumpFileNameByDumpType(NationStatesSharp.Enums.DumpType)">
+            <inheritdoc/>
+             <exception cref="T:System.InvalidOperationException">Thrown when the DumpType is not supported.</exception>
+        </member>
+        <member name="M:NationStatesSharp.DefaultDumpRetrievalService.IsLocalDumpAvailableAndUpToDate(NationStatesSharp.Enums.DumpType)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NationStatesSharp.DefaultDumpRetrievalService.IsLocalDumpAvailableAndUpToDate(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NationStatesSharp.Interfaces.IDumpRetrievalService.DownloadDumpAsync(NationStatesSharp.Enums.DumpType,System.Threading.CancellationToken)">
+            <summary>
+            Downloads a dump of the specified type as compressed Stream
+            </summary>
+            <param name="type">Type of dump to download.</param>
+            <param name="cancellationToken">The cancellationToken to cancel that request.</param>
+            <returns>The compressed stream from the HTTP Response.</returns>
+        </member>
+        <member name="M:NationStatesSharp.Interfaces.IDumpRetrievalService.DownloadDumpAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Downloads a dump from the url as compressed Stream
+            </summary>
+            <param name="url">The url to download the dump from.</param>
+            <param name="cancellationToken"></param>
+            <returns>The compressed stream from the HTTP Response.</returns>
+        </member>
+        <member name="M:NationStatesSharp.Interfaces.IDumpRetrievalService.GetDumpFileNameByDumpType(NationStatesSharp.Enums.DumpType)">
+            <summary>
+            Returns the default file name of the specified dump type.
+            </summary>
+            <param name="type">Type of dump to get the name.</param>
+            <returns>The default dump file name.</returns>
+        </member>
+        <member name="M:NationStatesSharp.Interfaces.IDumpRetrievalService.IsLocalDumpAvailableAndUpToDate(NationStatesSharp.Enums.DumpType)">
+            <summary>
+            Returns if a dump of the specified type is available and up to date.
+            </summary>
+            <param name="type">Type of dump to get the availabilty from.</param>
+            <returns>If a local dump is available and up to date.</returns>
+            <remarks>NOTE: The official dump update time (22:30 PM PST -> 6:30 AM UTC) is compared to the last write time of that file to determine if it is outdated or not.</remarks>
+        </member>
+        <member name="M:NationStatesSharp.Interfaces.IDumpRetrievalService.IsLocalDumpAvailableAndUpToDate(System.String)">
+            <summary>
+            Returns if a dump of the specified path is available and up to date.
+            </summary>
+            <param name="path">The path where the local dump file is located.</param>
+            <returns>If a local dump is available and up to date.</returns>
+            <remarks>NOTE: The official dump update time (22:30 PM PST -> 6:30 AM UTC) is compared to the last write time of that file to determine if it is outdated or not.</remarks>
+        </member>
+        <member name="E:NationStatesSharp.RequestPriorityQueue.Jammed">
+            <summary>
+            The queue detected, during the last Enqueue operation, that no one is waiting for new items. It is therefore reasonable to assume that the consumer died.
+            Use this event to detected consumer failures and for restarting these.
+            </summary>
+        </member>
+    </members>
+</doc>
