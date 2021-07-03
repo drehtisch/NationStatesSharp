@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace NationStatesSharp.Interfaces
 {
-#pragma warning disable CS1591
-
+    /// <summary>
+    /// Service for Downloading NationStates Dumps
+    /// </summary>
     public interface IDumpRetrievalService
     {
-#pragma warning restore CS1591
 
         /// <summary>
         /// Downloads a dump of the specified type as compressed Stream
