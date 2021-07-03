@@ -16,21 +16,20 @@ namespace NationStatesSharp
     {
         private const string BaseUrl = "https://nationstates.net/";
 
-        private Request()
+        private Request(string traceId)
         {
-            TraceId = GenerateTraceId();
+            TraceId = string.IsNullOrWhiteSpace(traceId) ? GenerateTraceId() : traceId;
             Status = RequestStatus.Pending;
             _completionSource = new TaskCompletionSource();
         }
 
-        public Request(string url, ResponseFormat responseFormat) : this()
+        public Request(string url, ResponseFormat responseFormat, string traceId = null) : this(traceId)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
                 throw new ArgumentException($"\"{nameof(url)}\" cannot be null or whitespace.", nameof(url));
             }
-            Uri parsedUri;
-            if (url.Contains("pages") && Uri.TryCreate(new Uri(BaseUrl), url, out parsedUri))
+            if (url.Contains("pages") && Uri.TryCreate(new Uri(BaseUrl), url, out Uri parsedUri))
             {
                 Uri = parsedUri;
             }
@@ -96,8 +95,8 @@ namespace NationStatesSharp
             StringBuilder builder = new StringBuilder();
             Enumerable
                .Range(65, 26)
-                .Select(e => ((char)e).ToString())
-                .Concat(Enumerable.Range(97, 26).Select(e => ((char)e).ToString()))
+                .Select(e => ((char) e).ToString())
+                .Concat(Enumerable.Range(97, 26).Select(e => ((char) e).ToString()))
                 .Concat(Enumerable.Range(0, 10).Select(e => e.ToString()))
                 .OrderBy(e => Guid.NewGuid())
                 .Take(11)
