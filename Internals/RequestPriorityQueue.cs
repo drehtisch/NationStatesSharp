@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NationStatesSharp
 {
-    internal class RequestPriorityQueue : SimplePriorityQueue<Request, int>
+    internal class RequestPriorityQueue : SimplePriorityQueue<Request, uint>
     {
         /// <summary>
         /// The queue detected, during the last Enqueue operation, that no one is waiting for new items. It is therefore reasonable to assume that the consumer died.
@@ -16,7 +16,7 @@ namespace NationStatesSharp
         /// </summary>
         public event EventHandler Jammed;
 
-        public new void Enqueue(Request item, int priority)
+        public new void Enqueue(Request item, uint priority)
         {
             if (item.Status == RequestStatus.Pending)
             {

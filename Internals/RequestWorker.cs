@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NationStatesSharp
 {
-    public class RequestWorker
+    internal class RequestWorker
     {
         public const long API_REQUEST_INTERVAL = 6000000; //0,6 s
         private readonly HttpDataService _dataService;
@@ -46,7 +46,7 @@ namespace NationStatesSharp
 
         public event EventHandler RestartRequired;
 
-        public void Enqueue(Request request, int priority = 1000)
+        public void Enqueue(Request request, uint priority = 1000)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
