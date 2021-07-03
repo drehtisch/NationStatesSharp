@@ -90,6 +90,24 @@ namespace NationStatesSharp
 
         public Stream GetResponseAsStream() => Response as Stream;
 
+        public async Task<XDocument> GetXmlResponseAsync(CancellationToken cancellationToken = default)
+        {
+            await WaitForResponseAsync(cancellationToken).ConfigureAwait(false);
+            return GetResponseAsXml();
+        }
+
+        public async Task<bool?> GetBoolResponseAsync(CancellationToken cancellationToken = default)
+        {
+            await WaitForResponseAsync(cancellationToken).ConfigureAwait(false);
+            return GetResponseAsBoolean();
+        }
+
+        public async Task<Stream> GetStreamResponseAsync(CancellationToken cancellationToken = default)
+        {
+            await WaitForResponseAsync(cancellationToken).ConfigureAwait(false);
+            return GetResponseAsStream();
+        }
+
         private string GenerateTraceId()
         {
             StringBuilder builder = new StringBuilder();
